@@ -1,0 +1,63 @@
+create table t_summary_car_monthly
+(
+    id              BIGINT(19) auto_increment
+        primary key,
+    bike_barcode    BIGINT(19)                              not null comment '车牌号',
+    dept_id         BIGINT(19)                              not null comment '辖区id',
+    summary_month   INT(10)                                 not null comment '年月',
+    dept_name       VARCHAR(256)                            null comment '辖区名称',
+    riding_miles    DOUBLE(22, 0) default 0                 null comment '本辖区骑行里程',
+    riding_duration DOUBLE(22, 0) default 0                 null comment '本辖区骑行时长(单位秒)',
+    alarm_count     INT(10)       default 0                 null comment '越界报警次数',
+    create_time     DATETIME(19)  default CURRENT_TIMESTAMP null,
+    remark          VARCHAR(1024)                           null,
+    constraint AK_summary_car_monthly_key_2
+        unique (dept_id, bike_barcode, summary_month)
+)
+    collate = utf8mb4_unicode_ci;
+
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (664, 105504100001, 2, 201911, '吴泾派出所', 0, 0, 343, '2019-11-30 13:39:18', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (665, 111111, 1, 201906, '总辖区1', 0, 0, 1, '2019-11-30 13:39:18', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (666, 105501008001, 2, 201909, '吴泾派出所', 0, 2437.5779999999995, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (667, 105501008582, 33, 201909, '西丽派出所', 4134, 144489.389, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (668, 105501008475, 33, 201911, '西丽派出所', 0, 253.165, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (669, 105501003001, 2, 201909, '吴泾派出所', 0, 984.954, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (670, 105501008471, 33, 201910, '西丽派出所', 0, 13.44, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (671, 105501008471, 2, 201909, '吴泾派出所', 0, 5827.418999999999, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (672, 105501009999, 33, 201911, '西丽派出所', 511, 5341.646999999999, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (673, 105501008470, 2, 201909, '吴泾派出所', 0, 168.905, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (674, 105501008518, 2, 201910, '吴泾派出所', 197, 4173.054000000001, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (675, 105501008561, 33, 201909, '西丽派出所', 0, 1112.019, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (676, 999, 2, 201910, '吴泾派出所', 0, 0, 412, '2019-11-30 13:39:18', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (677, 105501008471, 33, 201911, '西丽派出所', 0, 6806.821999999999, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (678, 38888888800, 33, 201911, '西丽派出所', 0, 0, 67, '2019-11-30 13:39:18', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (679, 105501008686, 33, 201911, '西丽派出所', 0, 0, 78, '2019-11-30 13:39:18', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (680, 105501008548, 62, 201907, '西丽地铁站岗亭1', 1055, 17.267, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (681, 105501008548, 2, 201907, '吴泾派出所', 0, 182919.16700000002, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (682, 105501009109, 2, 201909, '吴泾派出所', 0, 36.3, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (683, 105501008518, 33, 201910, '西丽派出所', 12472113, 71333.12899999997, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (684, 105501008666, 33, 201911, '西丽派出所', 8277, 28805.609000000004, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (685, 105501009002, 2, 201908, '吴泾派出所', 0, 404946.157, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (686, 105501008518, 2, 201909, '吴泾派出所', 37403194, 29262.93599999999, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (687, 105501009001, 2, 201907, '吴泾派出所', 0, 1127048.1330000001, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (688, 105501008561, 2, 201909, '吴泾派出所', 0, 172.874, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (689, 105501008545, 33, 201910, '西丽派出所', 5387, 16281.004000000003, 16, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (690, 105501008569, 2, 201910, '吴泾派出所', 0, 0, 3, '2019-11-30 13:39:18', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (691, 105501008566, 37, 201909, '车墩派出所', 0, 24781.388, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (692, 105501008548, 2, 201909, '吴泾派出所', 0, 29874.931, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (693, 105501008888, 37, 201909, '车墩派出所', 0, 1383.055, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (694, 105501008545, 33, 201911, '西丽派出所', 31116, 122295.49399999988, 1, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (695, 105501009001, 2, 201908, '吴泾派出所', 0, 197578.74199999997, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (696, 105501009009, 2, 201909, '吴泾派出所', 0, 337604.418, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (697, 105501008548, 52, 201907, '留仙洞派出所', 1011, 30.374, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (698, 105501008518, 33, 201909, '西丽派出所', 49874079, 84480.50000000004, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (699, 105501009024, 2, 201908, '吴泾派出所', 0, 89819.89899999999, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (700, 105501008888, 2, 201909, '吴泾派出所', 0, 5056.727, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (701, 105501008548, 48, 201907, '西丽地铁站岗亭', 250, 1778.767, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (702, 105501009024, 2, 201909, '吴泾派出所', 0, 21103.280999999995, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (703, 105501008471, 33, 201909, '西丽派出所', 1084, 24330.365, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (704, 105501009109, 33, 201909, '西丽派出所', 0, 741.4060000000001, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (705, 105501008582, 2, 201908, '吴泾派出所', 0, 663699.5070000001, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (706, 105501008582, 2, 201909, '吴泾派出所', 0, 3994.0259999999994, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (707, 105501008898, 2, 201909, '吴泾派出所', 0, 6091.394, 0, '2019-11-30 13:38:29', null);
+INSERT INTO cyoubike.t_summary_car_monthly (id, bike_barcode, dept_id, summary_month, dept_name, riding_miles, riding_duration, alarm_count, create_time, remark) VALUES (708, 105501008582, 33, 201910, '西丽派出所', 12474052, 7093.686999999997, 0, '2019-11-30 13:38:29', null);
