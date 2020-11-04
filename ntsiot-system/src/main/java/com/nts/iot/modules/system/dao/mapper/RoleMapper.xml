@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.RoleMapper">
+
+    <sql id="Base_Column_List">
+        id, create_time as createTime, name, remark, data_scope as dataScope
+	</sql>
+
+    <select id="queryAll" resultType="com.nts.iot.modules.system.model.Role">
+        select
+        <include refid="Base_Column_List"/>
+        from role
+        <if test="name != null and name != ''">
+            where name like concat('%',#{name},'%')
+        </if>
+    </select>
+
+    <select id="selectPage" resultType="com.nts.iot.modules.system.model.Role">
+        select
+        distinct r.id, r.create_time as createTime, r.name, r.remark, r.data_scope as dataScope
+        from role r inner join roles_depts rd on r.id = rd.role_id
+        <if test="name != null and name != ''">
+            where r.name like concat('%',#{name},'%')
+        </if>
+        <if test="depts != null and depts.size() > 0">
+            and rd.dept_id in
+            <foreach collection="depts" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectOne" resultType="com.nts.iot.modules.system.model.Role">
+        select
+        distinct r.id, r.create_time as createTime, r.name, r.remark, r.data_scope as dataScope
+        from role r inner join roles_depts rd on r.id = rd.role_id
+        where r.id = #{id}
+
+        <if test="depts != null and depts.size() > 0">
+            and rd.dept_id in
+            <foreach collection="depts" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findByName" resultType="com.nts.iot.modules.system.model.Role">
+        select
+        <include refid="Base_Column_List"/>
+        from role where name = #{name}
+        <!-- <if test="name != null">
+             where name like concat('%',#{name},'%')
+         </if>-->
+    </select>
+
+    <select id="findByUserId" resultType="com.nts.iot.modules.system.model.Role">
+        select
+            r.id, r.create_time as createTime, r.name, r.remark, r.data_scope as dataScope
+        from role r, users_roles ur
+        where r.id = ur.role_id
+        and ur.user_id = #{id}
+    </select>
+
+</mapper>
+

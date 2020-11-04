@@ -1,0 +1,56 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.NewsMapper">
+
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.News">
+        select a.id, a.title, a.type, a.content, a.jurisdiction,d.name as jurisdictionName,a.is_visible as isVisible, a.create_time as createTime
+        from news a
+        left join dept d on a.jurisdiction=d.id
+        where 1=1
+        <if test="title != null and title != ''">
+            and title like concat(concat("%",#{title}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by a.create_time desc
+    </select>
+
+    <select id="getByNewId" resultType="com.nts.iot.modules.system.model.News">
+        select n.id, n.title, n.type, n.content, n.jurisdiction, n.is_visible as isVisible, n.create_time as createTime,
+                p.path as urlLink, dict.label as tag
+        from news n left join t_picture p on n.id = p.pk and p.type = "NEWS_IMG"
+        left join (
+            select dd.value, dd.label
+            from dict d, dict_detail dd
+            where d.id = dd.dict_id
+            and d.name = 'news_type'
+        ) dict on n.type = dict.value
+        where n.id = #{id}
+    </select>
+
+    <select id="getNewsByDeptId" resultType="com.nts.iot.modules.system.model.News">
+        select n.id, n.title, n.create_time as createTime, p.path as urlLink, dict.label as tag
+        from news n
+        left join t_picture p on n.id = p.pk and p.type = 'NEWS_IMG'
+        left join (
+            select dd.value, dd.label
+            from dict d, dict_detail dd
+            where d.id = dd.dict_id
+            and d.name = 'news_type'
+        ) dict on n.type = dict.value
+        where 1=1
+        and n.jurisdiction = #{deptId}
+        order by n.create_time desc
+<!--        <if test="jurisdictions != null and jurisdictions.size() > 0">-->
+<!--            and n.jurisdiction in-->
+<!--            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">-->
+<!--                #{item}-->
+<!--            </foreach>-->
+<!--        </if>-->
+
+    </select>
+</mapper>

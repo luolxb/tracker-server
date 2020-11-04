@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="org.springboot.sample" level="TRACE" />
+
+    <!--按天生成日志-->
+    <appender name="logFile"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <Prudent>true</Prudent>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>
+                applog/%d{yyyy-MM-dd}/%d{yyyy-MM-dd}.log
+            </FileNamePattern>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} -%msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+
+    <logger name="com.nts.iot" level="DEBUG" >
+        <appender-ref ref="logFile" />
+    </logger>
+
+</configuration>

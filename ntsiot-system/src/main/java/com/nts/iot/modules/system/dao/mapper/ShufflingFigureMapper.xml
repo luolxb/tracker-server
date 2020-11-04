@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.ShufflingFigureMapper">
+    <!-- 查询-->
+    <select id="queryAll" resultType="com.nts.iot.modules.system.model.ShufflingFigure">
+        SELECT
+        sf.id,
+        sf.name,
+        sf.jurisdiction,
+        sf.is_enable,
+        if(sf.is_enable=0,'否','是') as radio,
+        d.name as jurisdictionName,
+        sf.url_link,
+        sf.create_time,
+        sf.content
+        FROM
+        shuffling_figure sf left join dept d on sf.jurisdiction = d.id
+        where 1=1
+        <if test="name != null and name != ''">
+            and sf.name like concat(concat("%",#{name}),"%")
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and sf.create_time &gt; #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and sf.create_time &lt; #{endTime}
+        </if>
+        <if test="jurisdiction != null and jurisdiction.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdiction" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by sf.create_time desc
+    </select>
+
+    <!-- 根据辖区id查询轮播图-->
+    <select id="findShufflingFigure" resultType="com.nts.iot.modules.system.model.ShufflingFigure">
+        SELECT
+        sf.id,
+        sf.url_link,
+        sf.content
+        FROM
+        shuffling_figure sf
+        WHERE sf.is_enable = '1' AND sf.jurisdiction=#{jurisdiction}
+        order by sf.create_time desc
+    </select>
+
+    <!-- 根据图片url获得-->
+    <select id="getContent" resultType="com.nts.iot.modules.system.model.ShufflingFigure">
+        SELECT
+        *
+        FROM
+        shuffling_figure sf
+        WHERE sf.url_link=#{url}
+    </select>
+</mapper>

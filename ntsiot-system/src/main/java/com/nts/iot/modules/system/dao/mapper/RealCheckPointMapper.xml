@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.RealCheckPointMapper">
+    <!--查询任务详细-->
+    <select id="selectTaskDetail" resultType="com.nts.iot.modules.system.dto.TaskDetailDto">
+        select
+            rcpt.id AS taskId,
+                        rcp.name,
+                        ifnull(rcpt.task_name, '') as taskName,
+                        rcpt.remark,
+                        rcpt.longitude,
+                        rcpt.latitude,
+                        rcpt.is_over,
+                        rcpt.task_state,
+                        rcp.longitude as pLongitude,
+                        rcp.latitude as pLatitude
+            from t_real_check_point rcp left join t_real_check_point_task rcpt
+            on rcp.id = rcpt.real_point_id
+            where rcp.id = #{id}
+    </select>
+
+</mapper>

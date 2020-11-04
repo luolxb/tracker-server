@@ -1,0 +1,124 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.miniApp.dao.AppointmentMapper">
+    <sql id="Base_Column_List">
+        id,
+        username,
+        phone,
+        appointment_date as appointmentDate,
+        appointment_time as appointmentTime,
+        jurisdiction as "jurisdiction",
+        address,
+        create_time as createTime,
+        update_time as updateTime,
+        status
+	</sql>
+    <select id="getLatestAppointment" resultType="com.nts.iot.modules.miniApp.model.Appointment">
+        select
+        <include refid="Base_Column_List"/>
+        from appointment
+        where create_time = (
+            SELECT max(create_time)
+            FROM appointment
+            where ma_open_id = #{openId}
+        )
+    </select>
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.miniApp.model.Appointment">
+        select
+        <include refid="Base_Column_List"/>
+        from appointment
+        where 1=1
+        <if test="username != null and username != ''">
+            and username like concat(concat("%",#{username}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and unix_timestamp(appointment_date)  <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and unix_timestamp(appointment_date)  <![CDATA[ <= ]]> #{endTime}
+        </if>
+        order by create_time desc
+    </select>
+
+    <!--按照天统计-->
+    <select id="appointmentStaticByDay" resultType="com.nts.iot.modules.system.dto.AppointmentStaticDTO">
+        SELECT
+            DATE_FORMAT( ta.the_time,'%Y-%m-%d' ) AS dt,
+            ifnull( tb.num, 0 ) AS totalNum
+        FROM
+            (
+        SELECT
+            @cdate := date_add( @cdate, INTERVAL - 1 DAY ) AS the_time
+        FROM
+            ( SELECT @cdate := date_add( from_unixtime(#{endTime} / 1000), INTERVAL + 1 DAY ) FROM appointment LIMIT #{times} ) t1
+            ) ta
+            LEFT JOIN (
+        SELECT
+            from_unixtime( create_time / 1000, '%Y-%m-%d'  ) AS ct,
+            count( * ) AS num
+        FROM
+            appointment
+        WHERE
+            from_unixtime(create_time / 1000) BETWEEN from_unixtime(#{startTime} / 1000)
+            AND  from_unixtime( #{endTime} / 1000)
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY
+            ct
+            ) tb ON DATE_FORMAT( ta.the_time, '%Y-%m-%d'  ) = tb.ct;
+    </select>
+
+    <!--按照月统计-->
+    <select id="appointmentStaticByMonth" resultType="com.nts.iot.modules.system.dto.AppointmentStaticDTO">
+        SELECT
+            DATE_FORMAT( ta.the_time,'%Y-%m' ) AS dt,
+            ifnull( tb.num, 0 ) AS totalNum
+        FROM
+            (
+        SELECT
+            @cdate := date_add( @cdate, INTERVAL - 1 month ) AS the_time
+        FROM
+            ( SELECT @cdate := date_add(from_unixtime(#{endTime} / 1000), INTERVAL + 1 month ) FROM appointment LIMIT #{times} ) t1
+            ) ta
+            LEFT JOIN (
+        SELECT
+            from_unixtime( create_time / 1000, '%Y-%m'  ) AS ct,
+            count( * ) AS num
+        FROM
+            appointment
+        WHERE
+            from_unixtime(create_time / 1000) BETWEEN from_unixtime(#{startTime} / 1000)
+            AND  from_unixtime( #{endTime} / 1000)
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY
+            ct
+            ) tb ON DATE_FORMAT( ta.the_time, '%Y-%m'  ) = tb.ct;
+    </select>
+
+    <select id="countStatusByjurisdictions" resultType="java.util.HashMap">
+        SELECT count(case when `status` = '1' THEN id end) as accepted,count(case when `status` = '0' THEN id end) as not_accepted
+        from appointment where 1=1
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>

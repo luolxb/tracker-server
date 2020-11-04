@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.UserMapper">
+    <sql id="Base_Column_List">
+        id, avatar, create_time as createTime, email, enabled, password, username, last_password_reset_time as lastPasswordResetTime,
+         phone,address,contact_person contactPerson,nick_name nickName, p_id pId,custom_type_id customTypeId
+	</sql>
+
+    <select id="findByUsername" resultType="com.nts.iot.modules.system.model.User">
+        select
+        <include refid="Base_Column_List" />
+        from user where 1=1
+        <if test="username != null and username != ''">
+            and username = #{username}
+        </if>
+    </select>
+
+
+    <select id="findByEmail" resultType="com.nts.iot.modules.system.model.User">
+        select
+        <include refid="Base_Column_List" />
+        from user where 1=1
+        <if test="email != null and email != ''">
+            and email = #{email}
+        </if>
+    </select>
+
+    <select id="findByPhone" resultType="com.nts.iot.modules.system.model.User">
+        select
+        <include refid="Base_Column_List" />
+        from user where 1=1
+        <if test="phone != null and phone != ''">
+            and phone = #{phone}
+        </if>
+    </select>
+
+    <update id="updatePass">
+        update user set password = #{pass} , last_password_reset_time = #{lastPasswordResetTime}
+        where username = #{username}
+    </update>
+
+    <update id="updateAvatar">
+        update user set avatar = #{url} where username = #{username}
+    </update>
+
+    <update id="updateEmail">
+        update user set email = #{email} where username = #{username}
+    </update>
+
+    <select id="queryListByjurisdictions" resultType="com.nts.iot.modules.system.model.User">
+        select
+        <include refid="Base_Column_List" />
+        from user where 1=1
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and dept_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <!--    运营统计-->
+    <select id="operationalStatistics" resultType="com.nts.iot.modules.system.model.vo.UserOperationalVo">
+
+
+
+    </select>
+
+</mapper>

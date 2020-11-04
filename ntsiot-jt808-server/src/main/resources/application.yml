@@ -1,0 +1,8 @@
+server:
+  port: 6788
+jt808:
+  server:
+    port: 9500
+spring:
+  profiles:
+    active: dev

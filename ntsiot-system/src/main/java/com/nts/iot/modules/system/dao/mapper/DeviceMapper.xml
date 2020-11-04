@@ -1,0 +1,327 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.DeviceMapper">
+
+    <sql id="Base_Column_List">
+        d.id,
+        d.device_name deviceName,
+        d.device_type deviceType,
+        d.device_no deviceNo,
+        d.device_logo deviceLogo,
+        d.remark,
+        d.password,
+        d.create_time createTime,
+        d.create_by createBy,
+        d.update_time updateTime,
+        d.update_by updateBy,
+        d.enabled,
+        d.del_flag delFlag,
+        d.leave_factory_time leaveFactoryTime,
+        d.install_time installTime,
+        d.platform_expires_time platformExpiresTime,
+        d.user_expires_time userExpiresTime,
+        d.status,
+        d.version,
+        d.location,
+        d.gps_date gpsDate,
+        d.card_sim cardSim,
+        d.car_no carNo,
+        d.speed_alert speedAlert,
+        d.speed_time speedTime,
+        d.high_temperature_alert highTemperatureAlert,
+        d.low_temperature_alert lowTemperatureAlert,
+        d.icc_id iccId,
+        d.car_no_colour carNoColour,
+        d.frame_no frameNo,
+        d.engine_no engineNo,
+        d.car_type carType,
+        d.activation_code activationCode,
+        d.gender,
+        d.type,
+        d.car_made_country carMadeCountry,
+        d.car_init_time carInitTime,
+        d.contact_person contactPerson,
+        d.phone phone,
+        d.last_on_line_time lastOnLineTime,
+        d.rest_time restTime,
+        d.activation,
+        d.activation_time activationTime
+    </sql>
+
+    <update id="updateDevice">
+        update device
+        <trim prefix="SET" suffixOverrides=",">
+            device_name = #{deviceName},
+            device_type = #{deviceType},
+            device_no = #{deviceNo},
+            device_logo = #{deviceLogo},
+            remark = #{remark},
+            password = #{password},
+            update_time = #{updateTime},
+            update_by = #{updateBy},
+            enabled = #{enabled},
+            <if test="activation != null">activation = #{activation},</if>
+            <if test="activationTime != null">activation_time = #{activationTime},</if>
+            <if test="lastOnLineTime != null">last_on_line_time = #{lastOnLineTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            leave_factory_time = #{leaveFactoryTime},
+            install_time = #{installTime},
+            platform_expires_time = #{platformExpiresTime},
+            user_expires_time = #{userExpiresTime},
+            status = #{status},
+            version = #{version},
+            location = #{location},
+            gps_date = #{gpsDate},
+            card_sim = #{cardSim},
+            car_no = #{carNo},
+            speed_alert = #{speedAlert},
+            speed_time = #{speedTime},
+            high_temperature_alert = #{highTemperatureAlert},
+            low_temperature_alert = #{lowTemperatureAlert},
+            icc_id = #{iccId},
+            car_no_colour = #{carNoColour},
+            frame_no = #{frameNo},
+            engine_no = #{engineNo},
+            car_type = #{carType},
+            activation_code = #{activationCode},
+            gender = #{gender},
+            type = #{type},
+            car_made_country = #{carMadeCountry},
+            car_init_time = #{carInitTime},
+            contact_person = #{contactPerson},
+            phone = #{phone},
+        </trim>
+        <where>
+            and id = #{id}
+        </where>
+    </update>
+
+    <select id="queryPage" resultType="com.nts.iot.modules.system.model.vo.DeviceVo">
+        select
+        <include refid="Base_Column_List"/>,
+        u.username customName,
+        u.id customId,
+        df.`fence_id`
+        from device d
+        join user_device ud on d.id = ud.device_id
+        join user u on u.id = ud.user_id
+        LEFT JOIN device_fence df ON d.`id` = df.`device_id`
+        <where>
+            <if test="search != null and search != ''">
+                and CONCAT_WS(',',d.device_no,d.device_name) like concat('%',#{search},'%')
+            </if>
+            <if test="userExpiresTimeStart != null and userExpiresTimeStart != ''">
+                and date_format(d.user_expires_time,'%Y-%m-%d') <![CDATA[ >= ]]>
+                date_format(#{userExpiresTimeStart},'%Y-%m-%d')
+            </if>
+            <if test="userExpiresTimeEnd != null and userExpiresTimeEnd != ''">
+                and date_format(d.user_expires_time,'%Y-%m-%d') <![CDATA[ <= ]]>
+                date_format(#{userExpiresTimeEnd},'%Y-%m-%d')
+            </if>
+            <if test="platformExpiresTimeStart != null and platformExpiresTimeStart != '' ">
+                and date_format(d.platform_expires_time,'%Y-%m-%d') <![CDATA[ >= ]]>
+                date_format(#{platformExpiresTimeStart},'%Y-%m-%d')
+            </if>
+            <if test="platformExpiresTimeEnd != null and platformExpiresTimeEnd != '' ">
+                and date_format(d.platform_expires_time,'%Y-%m-%d') <![CDATA[ <= ]]>
+                date_format(#{platformExpiresTimeEnd},'%Y-%m-%d')
+            </if>
+            and d.del_flag = 1
+            and d.enabled = 1
+            -- and d.activation = 2
+            <if test="userId != null and userId != '' ">
+                and u.id = #{userId}
+            </if>
+
+        </where>
+        ORDER BY d.create_time DESC
+    </select>
+
+
+    <select id="operationalStatistics" resultType="com.nts.iot.modules.system.model.vo.UserOperationalVo">
+        SELECT COUNT(*)                                                                                deviceNum,
+               (SELECT COUNT(*)
+                FROM device d1
+                         JOIN user_device ud1
+                              ON ud1.`device_id` = d1.id
+                         JOIN USER u1
+                              ON u1.`id` = ud1.`user_id`
+                WHERE 1 = 1
+                  AND u1.id = #{userId}
+                  AND d1.`enabled` = 1
+                  AND d1.`del_flag` = 1
+                  AND d1.status > 1)                                                                   onLine,
+               (SELECT COUNT(*)
+                FROM device d2
+                         JOIN user_device ud2
+                              ON ud2.`device_id` = d2.id
+                         JOIN USER u2
+                              ON u2.`id` = ud2.`user_id`
+                WHERE 1 = 1
+                  AND u2.id = #{userId}
+                  AND d2.`enabled` = 1
+                  AND d2.`del_flag` = 1
+                  AND d2.activation = 2
+                  AND DATE_FORMAT(platform_expires_time, '%Y-%m-%d')  <![CDATA[ < ]]> DATE_FORMAT(NOW(), '%Y-%m-%d')) serviceExpires,
+               (SELECT COUNT(*)
+                FROM device d3
+                         JOIN user_device ud3
+                              ON ud3.`device_id` = d3.id
+                         JOIN USER u3
+                              ON u3.`id` = ud3.`user_id`
+                WHERE 1 = 1
+                  AND u3.id = #{userId}
+                  AND d3.`enabled` = 1
+                  AND d3.`del_flag` = 1
+                  AND DATE_FORMAT(d3.activation_time, '%Y-%m-%d')  <![CDATA[ = ]]> DATE_FORMAT(NOW(), '%Y-%m-%d'))    todayActivation,
+               (SELECT COUNT(*)
+                FROM device d4
+                         JOIN user_device ud4
+                              ON ud4.`device_id` = d4.id
+                         JOIN USER u4
+                              ON u4.`id` = ud4.`user_id`
+                WHERE 1 = 1
+                  AND u4.id = #{userId}
+                  AND d4.`enabled` = 1
+                  AND d4.`del_flag` = 1
+                  and d4.status = 1
+                  AND DATE_FORMAT(d4.last_on_line_time, '%Y-%m-%d')  <![CDATA[ <= ]]> DATE_FORMAT(NOW(), '%Y-%m-%d')
+                  AND DATE_FORMAT(d4.last_on_line_time, '%Y-%m-%d')  <![CDATA[ >= ]]> #{date})                        offLine3Day
+        FROM device d
+                 JOIN user_device ud
+                      ON ud.`device_id` = d.id
+                 JOIN USER u
+                      ON u.`id` = ud.`user_id`
+        WHERE 1 = 1
+          AND u.id = #{userId}
+          AND d.`enabled` = 1
+          AND d.`del_flag` = 1
+    </select>
+
+    <select id="queryPageOffLine" resultType="com.nts.iot.modules.system.model.vo.DeviceVo">
+        select
+        <include refid="Base_Column_List"/>,
+        u.username customName,
+        u.id customId
+        from device d
+        join user_device ud on d.id = ud.device_id
+        join user u on u.id = ud.user_id
+        <where>
+            <if test="search != null and search != ''">
+                and CONCAT_WS(',',d.device_no,d.device_name) like concat('%',#{search},'%')
+            </if>
+            <if test="startDate != null and startDate != ''">
+                and date_format(d.last_on_line_time,'%Y-%m-%d') <![CDATA[ >= ]]> #{startDate}
+            </if>
+            <if test="endDate != null and endDate != '' ">
+                and date_format(d.last_on_line_time,'%Y-%m-%d') <![CDATA[ <= ]]> #{endDate}
+            </if>
+            and d.del_flag = 1
+            and d.enabled = 1
+            and d.activation =2
+            and d.status =1
+            and u.id = #{userId}
+        </where>
+
+    </select>
+    <select id="selectById1" resultType="com.nts.iot.modules.system.model.vo.DeviceVo">
+        select
+        <include refid="Base_Column_List"/>,
+        u.username customName,
+        u.id customId
+        from device d
+        join user_device ud on d.id = ud.device_id
+        join user u on u.id = ud.user_id
+        <where>
+            and d.del_flag = 1
+            and d.enabled = 1
+            and d.id = #{id}
+        </where>
+    </select>
+
+
+    <select id="queryByDeviceId" resultType="com.nts.iot.modules.system.model.vo.DeviceVo">
+        select
+        <include refid="Base_Column_List"/>,
+        u.username customName,
+        u.id customId,
+        df.`fence_id`
+        from device d
+        join user_device ud on d.id = ud.device_id
+        join user u on u.id = ud.user_id
+        LEFT JOIN device_fence df ON d.`id` = df.`device_id`
+        <where>
+            and d.del_flag = 1
+            and d.enabled = 1
+            and d.id = #{deviceId}
+        </where>
+    </select>
+
+    <select id="queryByDeviceNo" resultType="com.nts.iot.modules.system.model.vo.DeviceVo">
+        select
+        <include refid="Base_Column_List"/>,
+        u.username customName,
+        u.id customId,
+        df.`fence_id`
+        from device d
+        join user_device ud on d.id = ud.device_id
+        join user u on u.id = ud.user_id
+        LEFT JOIN device_fence df ON d.`id` = df.`device_id`
+        <where>
+            and d.del_flag = 1
+            and d.enabled = 1
+            and d.device_no = #{devviceNo}
+        </where>
+    </select>
+
+
+    <select id="queryListByFenceId" resultType="com.nts.iot.modules.system.model.vo.DeviceVo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        device d
+        JOIN device_fence df
+        ON d.`id` = df.`device_id`
+        WHERE df.`fence_id` = #{fenceId}
+    </select>
+    <select id="queryPageExpires" resultType="com.nts.iot.modules.system.model.vo.DeviceVo">
+        select
+        <include refid="Base_Column_List"/>,
+        u.username customName,
+        u.id customId,
+        df.`fence_id`
+        from device d
+        join user_device ud on d.id = ud.device_id
+        join user u on u.id = ud.user_id
+        LEFT JOIN device_fence df ON d.`id` = df.`device_id`
+        <where>
+            <if test="search != null and search != ''">
+                and CONCAT_WS(',',d.device_no,d.device_name) like concat('%',#{search},'%')
+            </if>
+            <if test="userExpiresTimeStart != null and userExpiresTimeStart != ''">
+                and date_format(d.user_expires_time,'%Y-%m-%d') <![CDATA[ >= ]]>
+                date_format(#{userExpiresTimeStart},'%Y-%m-%d')
+            </if>
+            <if test="userExpiresTimeEnd != null and userExpiresTimeEnd != ''">
+                and date_format(d.user_expires_time,'%Y-%m-%d') <![CDATA[ <= ]]>
+                date_format(#{userExpiresTimeEnd},'%Y-%m-%d')
+            </if>
+            <if test="platformExpiresTimeStart != null and platformExpiresTimeStart != '' ">
+                and date_format(d.platform_expires_time,'%Y-%m-%d') <![CDATA[ >= ]]>
+                date_format(#{platformExpiresTimeStart},'%Y-%m-%d')
+            </if>
+            <if test="platformExpiresTimeEnd != null and platformExpiresTimeEnd != '' ">
+                and date_format(d.platform_expires_time,'%Y-%m-%d') <![CDATA[ <= ]]>
+                date_format(#{platformExpiresTimeEnd},'%Y-%m-%d')
+            </if>
+            and d.del_flag = 1
+            and d.enabled = 1
+            and d.activation = 2
+            <if test="userId != null and userId != '' ">
+                and u.id = #{userId}
+            </if>
+
+        </where>
+
+    </select>
+
+</mapper>

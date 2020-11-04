@@ -1,0 +1,23 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.QuestionnaireMapper">
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.Questionnaire">
+        select q.id, q.title, q.jurisdiction, q.create_time as createTime, q.is_show as isShow
+        from questionnaire q
+        where 1=1
+        <if test="title != null">
+            and q.title like concat(concat("%",#{title}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and q.jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by q.create_time
+    </select>
+
+    <update id="updataStatus">
+        update questionnaire set is_show = #{status} where id = #{id}
+    </update>
+</mapper>

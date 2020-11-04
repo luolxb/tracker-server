@@ -1,0 +1,207 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.ArticleMapper">
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.Article">
+        SELECT
+        a.id,
+        a.name,
+        a.jurisdiction,
+        d.name as jurisdictionName,
+        a.create_time,
+        a.is_repay,
+        an.total as number,
+        an.loan_number as loanNumber,
+        if(a.is_repay=0,'否','是') as isRepayName
+        FROM
+        article a left join dept d on a.jurisdiction=d.id inner join article_number an on a.id = an.article_id
+        where 1=1
+        <if test="name != null and name != ''">
+            and a.name like concat(concat("%",#{name}),"%")
+        </if>
+        <if test="jurisdiction != null and jurisdiction.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdiction" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        order by a.create_time desc
+    </select>
+
+    <select id="selectArticle" resultType="com.nts.iot.modules.system.model.Article">
+        SELECT
+        a.id,
+        a.name,
+        a.is_repay
+        FROM
+        article a
+        where 1=1
+        <if test="jurisdiction != null and jurisdiction != ''">
+            and a.jurisdiction = #{jurisdiction}
+        </if>
+        order by a.create_time desc
+    </select>
+
+
+    <select id="selectBorrowingReturning" resultType="com.nts.iot.modules.system.model.BorrowingReturning">
+      SELECT
+            br.id,
+            FROM_UNIXTIME(
+                br.get_time / 1000,
+                '%Y-%m-%d %H:%i'
+            ) AS repayTimeStr
+        FROM
+            borrowing_returning br
+		       WHERE
+            br.repay_time IS NOT NULL
+
+     AND br.ma_open_id = #{openId}
+        ORDER BY
+            br.create_time DESC
+    </select>
+
+    <select id="selectLoanCount" resultType="com.nts.iot.modules.system.dto.LoanCountDto">
+        SELECT
+            a.name,
+            lc.number,
+            a.is_repay as isRepay
+        FROM
+            loan_count lc
+        INNER JOIN article a ON lc.articleId = a.id
+        WHERE
+        lc.borrowingReturningId = #{borrowingReturningId}
+        AND a.jurisdiction = #{jurisdiction}
+    </select>
+
+    <select id="selectNotGive" resultType="com.nts.iot.modules.system.model.BorrowingReturning">
+      SELECT
+            br.id,
+            FROM_UNIXTIME(
+                br.get_time / 1000,
+                '%Y-%m-%d %H:%i'
+            ) AS repayTimeStr
+        FROM
+            borrowing_returning br
+		       WHERE
+            br.repay_time IS NULL
+
+     AND br.ma_open_id = #{openId}
+        ORDER BY
+            br.create_time DESC
+    </select>
+
+    <select id="selectNotGiveCount" resultType="com.nts.iot.modules.system.dto.LoanCountDto">
+
+        SELECT
+            lc.id,
+            a.name,
+            lc.number,
+            lc.giveNumber
+        FROM
+            loan_count lc
+        INNER JOIN article a ON lc.articleId = a.id
+        WHERE
+            a.is_repay = '1'
+        AND lc.borrowingReturningId = #{borrowingReturningId}
+		AND a.jurisdiction = #{jurisdiction}
+    </select>
+
+    <update id="updateGive">
+        update loan_count set giveNumber = #{giveNumber},giveTime = #{giveTime} where id = #{id}
+    </update>
+
+    <select id="selectLcCount" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            loan_count lc
+        INNER JOIN article a ON lc.articleId = a.id
+        WHERE
+            a.is_repay = '1'
+        AND
+            lc.borrowingReturningId = #{borrowingReturningId}
+    </select>
+
+    <select id="selectGiveCount" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            loan_count lc
+        INNER JOIN article a ON lc.articleId = a.id
+        WHERE
+            a.is_repay = '1'
+        AND
+             lc.number = lc.giveNumber
+        AND
+            lc.borrowingReturningId = #{borrowingReturningId}
+    </select>
+
+    <select id="selectGiveNumber" resultType="com.nts.iot.modules.system.dto.LoanCountDto">
+         SELECT
+         borrowingReturningId,
+            giveNumber
+        FROM
+            loan_count
+        WHERE
+            id = #{id}
+    </select>
+
+    <insert id="saveLoanCount">
+        INSERT INTO loan_count (
+            borrowingReturningId,
+            articleId,
+            number,
+            giveNumber
+        )
+        VALUES
+            (#{borrowingReturningId},#{articleId}, #{number}, #{giveNumber});
+    </insert>
+
+    <select id="selectLCByBorrowingReturningId" resultType="int">
+        SELECT
+            count(*)
+        FROM
+            loan_count lc
+        where
+          borrowingReturningId = #{borrowingReturningId}
+    </select>
+
+    <select id="selectLCByBRId" resultType="int">
+    SELECT
+        count(*)
+    FROM
+        loan_count lc
+
+    INNER JOIN article a ON lc.articleId = a.id
+    WHERE
+        a.is_repay = '0'
+    AND
+          borrowingReturningId = #{borrowingReturningId}
+    </select>
+
+    <delete id="delLCByBorrowingReturningId">
+        delete  from  loan_count where borrowingReturningId = #{borrowingReturningId}
+    </delete>
+
+    <select id="selectLoanC" resultType="com.nts.iot.modules.system.dto.LoanCountDto">
+        SELECT
+            lc.number,
+            an.id
+        FROM
+            loan_count lc
+        INNER JOIN article a ON lc.articleId = a.id
+        INNER JOIN article_number an ON a.id = an.article_id
+        WHERE
+            lc.borrowingReturningId = #{borrowingReturningId}
+    </select>
+
+    <select id="selectLoanCById" resultType="long">
+        SELECT
+            an.id
+        FROM
+            loan_count lc
+        INNER JOIN article a ON lc.articleId = a.id
+        INNER JOIN article_number an ON a.id = an.article_id
+        WHERE
+            lc.id = #{id}
+    </select>
+</mapper>

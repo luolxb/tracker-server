@@ -1,0 +1,108 @@
+server:
+  port: 80
+
+spring:
+  profiles:
+    active: dev
+  jackson:
+    time-zone: GMT+8
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+  #  redis:
+  #    #数据库索引
+  #    database: 8
+  #    host: 10.105.9.161
+  #    port: 6379
+  #    password: CyoU!#rD@170
+  #    jedis:
+  #      pool:
+  #        #最大连接数
+  #        max-active: 100
+  #        #最大阻塞等待时间(负数表示没限制)
+  #        max-wait: 2000
+  #        #最大空闲
+  #        max-idle: 500
+  #        #最小空闲
+  #        min-idle: 8
+  #    #连接超时时间
+  #    timeout: 5000
+  servlet:
+    multipart:
+      max-file-size: 100MB
+
+mybatis-plus:
+  typeAliasesPackage: com.nts.iot.modules.system.model
+  mapper-locations: classpath*:com/nts/iot/modules/**/dao/mapper/*.xml
+  global-config:
+    db-config:
+      logic-delete-value: 0 # 删除
+      logic-not-delete-value: 1 #未删除
+      #      key-generator: com.baomidou.mybatisplus.extension.incrementer.OracleKeyGenerator #oracle生成策略
+      id-type: input
+      db-type: mysql
+
+#七牛云
+qiniu:
+  accessKey: tObp3kCEGJ2Lvf7EWt7oGifrATth-P-QI6aMH9HT
+  secretKey: j4EpTqXwCbp2MoPzNsR6LdI_Kae9p69rskEPvfDK
+  bucketName: images
+  url: http://images.cyoubike.com
+  # 文件大小 /M
+  max-size: 100
+
+#验证码有效时间/分钟
+code:
+  expiration: 5
+
+#任务生成提前时间/分钟
+task:
+  before: 60
+
+
+#微信配置
+wechat:
+  mp:
+    appId: wx9ff35415f01f5237
+    secret: ae93a73831c4ac9bc908e4421fa4bcab
+    token: mmp
+    aesKey: sxRMRRXgVIZfil4Ng4MjNqfFoivY43S5i1Oz5q0q1mo
+  miniapp:
+    appId: wx7fd51c9e39e254eb
+    secret: 30dcc1ac5c8b7e4c295d1a1b4a1f9abf
+    token: mmp
+    aesKey: 7V53YdRHlJ9jgEGlbAfhvNbKdcTpU9n7pjS2BBWnIsB
+    msgDataFormat: JSON
+  pay:
+    appId: wx7fd51c9e39e254eb
+    mchId: 1434786802
+    mchKey: 3e72281acf19f73aa4f22b0b310404f3
+    keyPath: /usr/local/igs/weiPay/apiclient_cert.p12
+
+# 上传文件地址
+upload:
+  localPath: /usr/local/project/cyoubike/apache-tomcat-8.5.42/webapps/upload
+  uploadPath: http://39.105.164.236:8080/upload
+
+# jt808Server地址
+#jt808ServerUrl: http://115.159.188.112:6788
+# 引擎地址
+#engineServerUrl: http://118.89.109.254:8082
+# 微信充值回调地址
+#rechargeNotifyUrl: https://sapi.cyoubike.com/ma/rechargeNotify
+
+# EXCEL 导出模板路径
+excelTemplate:
+  path: /home/admin/cyoubike/system/template
+
+ntsiot:
+  data:
+    engine:
+      host: 127.0.0.1
+      port: 8082
+track:
+  proxy:
+    url: http://127.0.0.1:8080/track-proxy
+

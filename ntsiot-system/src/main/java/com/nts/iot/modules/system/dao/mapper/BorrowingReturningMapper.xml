@@ -1,0 +1,114 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.BorrowingReturningMapper">
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.BorrowingReturning">
+        SELECT
+        br.id,
+        u.name as "username",
+        br.get_time,
+        br.repay_time,
+        br.jurisdiction,
+        IF (
+        isnull(br.repay_time),
+        '否',
+        '是'
+        ) AS isGive
+        FROM
+        borrowing_returning br
+        LEFT JOIN t_ma_user u ON br.ma_open_id = u.openid
+        where 1=1
+        <if test="username != null and username != ''">
+            and u.name like concat(concat("%",#{username}),"%")
+        </if>
+        <if test="jurisdiction != null and jurisdiction.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdiction" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by br.create_time desc
+    </select>
+
+
+    <select id="getBorrowingReturningDto" resultType="com.nts.iot.modules.system.dto.BorrowingReturningDto">
+        SELECT
+        an.id,
+        an.total,
+        an.loan_number,
+        a.is_repay
+        FROM
+        article a
+        INNER JOIN article_number an ON a.id = an.article_id
+        WHERE a.id = #{id}
+        <if test="jurisdiction != null and jurisdiction != ''">
+            and a.jurisdiction = #{jurisdiction}
+        </if>
+    </select>
+
+    <select id="getBorrowingReturningInfo" resultType="com.nts.iot.modules.system.model.BorrowingReturning">
+        SELECT
+          *
+        FROM
+            borrowing_returning
+        WHERE
+            ma_open_id = #{openId}
+        AND article_id = #{articleId}  and repay_time is null
+    </select>
+
+    <select id="getBorrowingReturningDtoCount" resultType="com.nts.iot.modules.system.model.BorrowingReturning">
+        SELECT
+          *
+        FROM
+        borrowing_returning
+        WHERE
+        article_id = #{articleId} and repay_time is null and ma_open_id = #{openId}
+    </select>
+
+    <select id="detailBorrowingReturning" resultType="com.nts.iot.modules.system.model.BorrowingReturning">
+          SELECT
+            a.name,
+            br.get_time,
+            lc.number,
+            lc.giveNumber
+        FROM
+            borrowing_returning br
+        LEFT JOIN loan_count lc ON br.id = lc.borrowingReturningId
+        LEFT JOIN article a ON lc.articleId = a.id
+        WHERE
+        br.id = #{id}
+    </select>
+
+    <select id="exportLoanCount" resultType="com.nts.iot.modules.system.dto.LoanCountDto">
+        SELECT
+		lc.id,
+		a.is_repay as isRepay,
+        u.name as "username",
+        a.name,
+        lc.number,
+		lc.giveNumber,
+        FROM_UNIXTIME(
+        br.get_time / 1000,
+        '%Y-%m-%d %H:%i:%S'
+        ) getTime,
+        FROM_UNIXTIME(
+        lc.giveTime / 1000,
+        '%Y-%m-%d %H:%i:%S'
+        ) giveTime,
+        d.name as jurisdictionName,
+        dp.name AS pName
+        FROM
+        loan_count lc
+        LEFT JOIN borrowing_returning br ON lc.borrowingReturningId = br.id
+        LEFT JOIN t_ma_user u ON u.openid = br.ma_open_id
+        LEFT JOIN article a ON a.id = lc.articleId
+        LEFT JOIN dept d ON d.id = a.jurisdiction
+        LEFT JOIN dept dp ON d.pid = dp.id
+        where 1=1
+        <if test="username != null and username != ''">
+            and u.name like concat(concat("%",#{username}),"%")
+        </if>
+        <if test="jurisdiction != null and jurisdiction != ''">
+            and br.jurisdiction = #{jurisdiction}
+        </if>
+        order by br.create_time desc
+    </select>
+</mapper>

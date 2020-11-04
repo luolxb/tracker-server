@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.miniApp.dao.RechargeRecordMapper">
+    <!-- 查询-->
+    <select id="queryAll" resultType="com.nts.iot.modules.miniApp.model.RechargeRecord">
+        SELECT
+        record.id as "id",
+        record.out_recharge_id as "outRechargeId",
+        record.user_id as "userId",
+        record.history_id as "historyId",
+        record.charges_count as "chargesCount",
+        record.largess_count as "largessCount",
+        record.actual_count as "actualCount",
+        record.charges_time as "chargesTime",
+        record.status as "status",
+        u.name as "userName",
+        d.name as "deptName",
+        d.id as "deptId"
+        FROM
+        t_recharge_record record
+        left join t_ma_user u on u.id = record.user_id
+        left join dept d on d.id = u.dept_id
+        where 1=1
+        <if test="jurisdiction != null and jurisdiction != ''">
+            and u.dept_id = #{jurisdiction}
+        </if>
+        <if test="userName != null and userName != ''">
+            and u.userName like concat(concat("%",#{userName}),"%")
+        </if>
+        order by id desc
+    </select>
+</mapper>

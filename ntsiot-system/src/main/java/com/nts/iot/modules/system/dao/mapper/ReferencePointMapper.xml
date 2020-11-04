@@ -1,0 +1,23 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.ReferencePointMapper">
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.ReferencePoint">
+        select p.id, p.name, p.icon_type as iconType, i.name as type, p.longitude, p.latitude, p.dept_id as deptId, p.remark, p.create_time as createTime, p.update_time as updateTime
+        from reference_point p left join icon i on p.icon_type = i.id
+        where 1=1
+        <if test="iconType != null and iconType != ''">
+            and p.icon_type = #{iconType}
+        </if>
+        <if test="name != null and name != ''">
+            and p.name like concat(concat("%",#{name}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and p.dept_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by p.create_time desc
+    </select>
+
+</mapper>

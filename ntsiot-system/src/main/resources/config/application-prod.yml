@@ -1,0 +1,117 @@
+#配置数据源
+spring:
+  datasource:
+    druid:
+      type: com.alibaba.druid.pool.DruidDataSource
+      driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      #url: jdbc:log4jdbc:mysql://58de0158642ac.sh.cdb.myqcloud.com:7291/cyoubike?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+      #username: cyoubike
+      #password: cYou!Q@W
+      url: jdbc:log4jdbc:mysql://localhost:3306/cyoubike?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+      username: root
+      password: 123456
+      # 初始化连接大小
+      initial-size: 5
+      # 最小空闲连接数
+      min-idle: 5
+      max-active: 20
+      max-wait: 30000
+      # 可关闭的空闲连接间隔时间
+      time-between-eviction-runs-millis: 60000
+      # 配置连接在池中的最小生存时间
+      min-evictable-idle-time-millis: 300000
+      validation-query: select '1' from dual
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      pool-prepared-statements: true
+      max-open-prepared-statements: 20
+      max-pool-prepared-statement-per-connection-size: 20
+      # 配置监控统计拦截的filters
+      filters: stat
+
+      stat-view-servlet:
+        url-pattern: /druid/*
+        reset-enable: false
+        login-username: admin
+        login-password: 123456
+
+      web-stat-filter:
+        url-pattern: /*
+        exclusions: "*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico,/druid/*"
+  redis:
+    #数据库索引
+    database: 8
+    host: 10.105.9.161
+    port: 6379
+    password: CyoU!#rD@170
+    jedis:
+      pool:
+        #最大连接数
+        max-active: 100
+        #最大阻塞等待时间(负数表示没限制)
+        max-wait: 2000
+        #最大空闲
+        max-idle: 500
+        #最小空闲
+        min-idle: 8
+    #连接超时时间
+    timeout: 5000
+  # kafka config
+  kafka:
+    bootstrap-servers: 118.89.109.254:9092
+    consumer:
+      group-id: consumer-group-system
+      auto-offset-reset: latest
+      enable-auto-commit: true
+      auto-commit-interval: 100s
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+#jwt
+jwt:
+  header: Authorization
+  secret: mySecret
+  # token 过期时间 30天
+  expiration: 2592000000‬
+  auth:
+    # 授权路径
+    path: /login
+    # 获取用户信息
+    account: /info
+
+#是否允许生成代码，生产环境设置为false
+generator:
+  enabled: false
+
+#如果生产环境要开启swagger，需要配置请求地址
+#springfox:
+#  documentation:
+#    swagger:
+#      v2:
+#        host: # 接口域名或外网ip
+# jt808Server地址
+jt808ServerUrl: http://192.168.1.80:6788
+# jt808ScottServer地址
+jt808ScottServerUrl: http://192.168.1.80:6789
+# 引擎地址
+engineServerUrl: http:/192.168.1.80:8082
+# 微信充值回调地址
+rechargeNotifyUrl: https://sapi.cyoubike.com/ma/rechargeNotify
+
+# 项目相关配置
+nts:
+  # 名称
+  name: nts
+  # 版本
+  version: 1.0.0
+  # 版权年份
+  copyrightYear: 2020
+  # 实例演示开关
+  demoEnabled: false
+  # 文件路径 示例（ Windows配置D:/nts/uploadPath，Linux配置 /home/nts/uploadPath）
+  #profile: D:/nts/uploadPath
+  profile: /home/ntsiot/uploadPath
+  # 获取ip地址开关
+  addressEnabled: true

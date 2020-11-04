@@ -1,0 +1,90 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.FenceMapper">
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.Fence">
+        select f.*
+        from fence f
+        where f.user_id = #{userId}
+        <if test="name != null and name != ''">
+            and f.name like concat(concat("%",#{name}),"%")
+        </if>
+        <if test="type != null and type != ''">
+            and f.type = #{type}
+        </if>
+        order by f.create_time desc
+    </select>
+
+    <select id="selectListByJurisdiction" resultType="com.nts.iot.modules.system.model.Fence">
+        select
+        t.id, t.name, t.coordinate, t.jurisdiction, t.remark, t.create_time as createTime
+        from fence t
+        where 1 = 1
+        <if test="jurisdiction != null and jurisdiction != ''">
+            and t.jurisdiction = #{jurisdiction}
+        </if>
+    </select>
+
+    <select id="initFences" resultType="com.nts.iot.modules.system.model.Fence">
+        select *
+        from fence
+        order by jurisdiction asc
+    </select>
+    <select id="selectById" resultType="com.nts.iot.modules.system.model.Fence">
+        SELECT
+        f.*
+        FROM
+        fence f
+        JOIN device_fence df
+        ON df.`fence_id` = f.`id`
+        <where>
+            <if test="deviceId != null">
+                and df.device_id = #{deviceId}
+            </if>
+            <if test="fenceId">
+                and df.fence_id = #{fenceId}
+            </if>
+        </where>
+        GROUP BY f.`id`
+    </select>
+    <select id="fenceStatistic" resultType="com.nts.iot.modules.system.model.vo.FenceStatisticVo">
+        SELECT
+        d.`device_name`,
+        u.`username`,
+        d.`device_no`,
+        f.`name` fenceName,
+        f.`type`,
+        f.`status`,
+        f.`create_time` alertTime,
+        f.`coordinate`
+        FROM
+        fence f
+        LEFT JOIN device_fence df
+        ON f.id = df.fence_id
+        LEFT JOIN device d
+        ON d.id = df.device_id
+        JOIN USER u
+        ON u.id = f.user_id
+        <where>
+            and f.`user_id` = #{fenceStatisticRq.userId}
+            <if test="fenceStatisticRq.fenceType != null and fenceStatisticRq.fenceType != '' ">
+                and f.`type` = #{fenceStatisticRq.fenceType}
+            </if>
+            <if test="fenceStatisticRq.fenceStatus != null and fenceStatisticRq.fenceStatus != '' ">
+                and f.`status` = #{fenceStatisticRq.fenceStatus}
+            </if>
+            <if test="fenceStatisticRq.fenceName != null and fenceStatisticRq.fenceName != '' ">
+                and f.`name` = #{fenceStatisticRq.fenceName}
+            </if>
+            <if test="fenceStatisticRq.deviceNo != null and fenceStatisticRq.deviceNo != '' ">
+                and d.`device_no` = #{fenceStatisticRq.deviceNo}
+            </if>
+            <if test="fenceStatisticRq.startDate != null and fenceStatisticRq.startDate != '' ">
+                AND f.`create_time` &gt;= #{fenceStatisticRq.startDate}
+            </if>
+            <if test="fenceStatisticRq.endDate != null and fenceStatisticRq.endDate != '' ">
+                AND f.`create_time` &lt;= #{fenceStatisticRq.endDate}
+            </if>
+        </where>
+    </select>
+
+</mapper>

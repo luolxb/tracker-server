@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.TopUpMapper">
+    <!-- 查询-->
+    <select id="queryAll" resultType="com.nts.iot.modules.system.model.TopUp">
+        SELECT
+        id,
+        money,
+        jurisdiction,
+        create_time
+        FROM
+        top_up
+        where 1=1
+        <if test="jurisdiction != null and jurisdiction != ''">
+            and jurisdiction = #{jurisdiction}
+        </if>
+        <if test="money != null and money != ''">
+            and money like concat(concat("%",#{money}),"%")
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and create_time &gt; #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and create_time &lt; #{endTime}
+        </if>
+        order by create_time desc
+    </select>
+
+    <!-- 根据辖区查询金额-->
+    <select id="queryMoneyByJurisdiction" resultType="java.lang.String">
+        SELECT
+        money
+        FROM
+        top_up
+        where jurisdiction = #{jurisdiction}
+        order by create_time desc
+    </select>
+</mapper>

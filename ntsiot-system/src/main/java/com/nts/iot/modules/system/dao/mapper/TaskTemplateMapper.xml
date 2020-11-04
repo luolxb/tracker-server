@@ -1,0 +1,51 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.TaskTemplateMapper">
+
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.TaskTemplate">
+        select id, task_name as taskName,  path,  dept_id as deptId, create_time as createTime
+        from t_task_template
+        where 1=1
+        <if test="title != null and title != ''">
+            and task_name like concat(concat("%",#{title}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and dept_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by create_time desc
+    </select>
+
+    <update id="updateTaskStatus" >
+        update t_task_template set start_up = #{status} where id = #{taskId}
+    </update>
+
+    <select id="selectTaskApprovalsByPage" resultType="com.nts.iot.modules.system.dto.PatrolTaskDTO">
+        select t.id as taskId, t.task_name as taskName, t.patrolman, t.begin_time as beginTime, t.over_time as overTime,
+        t2.score, t.status, t.sys_patrol_start_time as sysPatrolStartTime, t.sys_patrol_end_time as sysPatrolEndTime, t.is_approval as isApproval
+        from t_real_task t left join t_task_approval t2 on t.id = t2.task_id
+        where 1=1
+        <if test="title != null and title != ''">
+            and t.task_name like concat(concat("%",#{title}),"%")
+        </if>
+        <if test="patrolman != null and patrolman != ''">
+            and t.patrolman like concat(concat("%",#{patrolman}),"%")
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and UNIX_TIMESTAMP(t.sys_patrol_start_time) *1000 <![CDATA[ >= ]]> #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and UNIX_TIMESTAMP(t.sys_patrol_end_time) *1000 <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and t.dept_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by t.create_time desc
+    </select>
+
+</mapper>

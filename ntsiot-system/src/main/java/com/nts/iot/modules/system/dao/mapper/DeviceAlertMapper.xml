@@ -1,0 +1,234 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.DeviceAlertMapper">
+
+    <select id="proportion" resultType="java.util.Map">
+        select count(da.id) alert_type_01,
+               (
+                   select count(*)
+                  FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_001'
+               )           alert_type_001,
+               (
+                   select  count(*)
+                  FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_002'
+               )           alert_type_002,
+               (
+                   select  count(*)
+                   FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_003'
+               )           alert_type_003,
+               (
+                   select  count(*)
+                  FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_004'
+               )           alert_type_004,
+               (
+                   select  count(*)
+                   FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_005'
+               )           alert_type_005,
+               (
+                   select  count(*)
+                   FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_006'
+               )           alert_type_006,
+               (
+                   select  count(*)
+                   FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_007'
+               )           alert_type_007,
+               (
+                   select  count(*)
+                   FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_008'
+               )           alert_type_008,
+               (
+                   select count(*)
+                  FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_009'
+               )           alert_type_009,
+               (
+                   select  count(*)
+                   FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_0010'
+               )           alert_type_0010,
+               (
+                   select  count(*)
+                  FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_0011'
+               )           alert_type_0011,
+               (
+                   select  count(*)
+                  FROM
+                    device_alert da1,
+                    device d1,
+                    user_device ud1
+                  WHERE 1 = 1
+                    AND da1.device_no = d1.device_no
+                    AND ud1.device_id = d1.id
+                    AND da1.del_flag = 1
+                    AND ud1.user_id = #{id}
+                    and da1.alert_type = 'alert_type_0012'
+               )           alert_type_0012
+        from device_alert da,
+             device d,
+             user_device ud
+        where 1 = 1
+          and da.device_no = d.device_no
+          and ud.device_id = d.id
+          and da.del_flag = 1
+          and ud.user_id = #{id}
+    </select>
+    <select id="monitor" resultType="java.util.Map">
+        select date_format(da.create_time, '%Y-%m-%d') date,
+        count(da.id) alertSum
+        from device_alert da,
+        device d,
+        user_device ud
+        where 1 = 1
+        and da.device_no = d.device_no
+        and ud.device_id = d.id
+        and ud.user_id = #{user.id}
+        and date_format(da.create_time, '%Y-%m-%d') <![CDATA[ >= ]]>#{startDate}
+        and date_format(da.create_time, '%Y-%m-%d') <![CDATA[ <= ]]>#{endDate}
+        group by date_format(da.create_time, '%Y-%m-%d')
+
+    </select>
+    <select id="selectDeviceAlertPage" resultType="com.nts.iot.modules.system.model.DeviceAlert">
+        select da.*,
+        d.device_name deviceName
+        from device_alert da
+        join device d on da.device_no = d.device_no
+        join user_device ud on ud.device_id = d.id
+        where 1=1
+        <if test="status != null">
+            and da.status = #{status}
+        </if>
+        <if test="deviceNo != null and  deviceNo != ''">
+            and da.device_no = #{deviceNo}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date_format(da.create_time, '%Y-%m-%d') <![CDATA[ <= ]]> #{endDate}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            and date_format(da.create_time, '%Y-%m-%d') <![CDATA[ >= ]]>#{startDate}
+        </if>
+        and ud.user_id = #{userId}
+    </select>
+
+    <select id="statistics" resultType="com.nts.iot.modules.system.model.vo.DeviceAlertTypeVo">
+        SELECT
+        d.device_name deviceName,
+        da.device_no deviceNo,
+        da.alert_type alertType,
+        COUNT(*) num
+        FROM
+        device_alert da,
+        device d,
+        user_device ud
+        where 1 = 1
+        and da.device_no = d.device_no
+        and ud.device_id = d.id
+        and da.del_flag = 1
+        and ud.user_id = #{userId}
+        <if test="deviceNo != null and deviceNo != ''">
+            and da.device_no = #{deviceNo}
+        </if>
+        <if test="startDate != null and startDate!= ''">
+            and date_format(da.create_time, '%Y-%m-%d') <![CDATA[ >= ]]>#{startDate}
+        </if>
+        <if test="endDate != null and endDate!= ''">
+            and date_format(da.create_time, '%Y-%m-%d') <![CDATA[ <= ]]>#{endDate}
+        </if>
+        GROUP BY da.device_no
+    </select>
+</mapper>

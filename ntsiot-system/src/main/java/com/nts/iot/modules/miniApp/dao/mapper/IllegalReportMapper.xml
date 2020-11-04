@@ -1,0 +1,140 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.miniApp.dao.IllegalReportMapper">
+    <select id="selectByPage" resultType="com.nts.iot.modules.miniApp.model.IllegalReport">
+        select
+        t.id, t.content, t.name, t.address, t.telephone, t.create_time as createTime, t.deal_time as dealTime, t.jurisdiction, d.name as deptName, t.type, t.point, t.user_name as userName
+        from illegal_report t left join dept d on t.jurisdiction = d.id
+        where 1=1
+        <if test="startTime != null and startTime != ''">
+            and t.create_time > #{startTime}
+        </if>
+
+        <if test="endTime != null and endTime != ''">
+            and t.create_time &lt; #{endTime}
+        </if>
+        <if test="jurisdiction != null and jurisdiction.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdiction" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by t.create_time desc
+    </select>
+
+    <select id="selectIllegalReport" resultType="com.nts.iot.modules.miniApp.model.IllegalReport">
+        SELECT
+        ir.content,
+        ir.name,
+        ir.address,
+        ir.telephone,
+        FROM_UNIXTIME(
+        ir.create_time / 1000,
+        '%Y-%m-%d %H:%i:%S'
+        ) time,
+        d.name as jurisdictionName,
+        dp.name as pname,
+        ir.type,
+        ir.user_name
+        FROM
+        illegal_report ir
+        LEFT JOIN dept d ON d.id = ir.jurisdiction
+        LEFT JOIN dept dp ON dp.id = d.pid
+        where 1=1
+        <if test="startTime != null and startTime != ''">
+            and ir.create_time > #{startTime}
+        </if>
+
+        <if test="endTime != null and endTime != ''">
+            and ir.create_time &lt; #{endTime}
+        </if>
+        <if test="jurisdiction != null and jurisdiction != ''">
+            and ir.jurisdiction = #{jurisdiction}
+        </if>
+        order by ir.create_time desc
+    </select>
+
+    <select id="getStatisticsByType" resultType="com.nts.iot.modules.miniApp.dto.IllegalStatisticsDTO">
+        <!--  按天统计 -->
+        <if test='dateType == "0"'>
+            select CONCAT(vv.year,'-', vv.month, '-', vv.day) as time, vv.type, count(tt.id) as cnt
+        </if>
+        <!-- 按周统计 -->
+        <if test='dateType == "1"'>
+            select concat(vv.year, '年第', vv.week, '周' ) as time, vv.type, count(tt.id) as cnt
+        </if>
+        <!--  按月统计 -->
+        <if test='dateType == "2"'>
+            select concat(vv.year, '年第', vv.month, '月' ) as time, vv.type, count(tt.id) as cnt
+        </if>
+        <!--  按季度统计 -->
+        <if test='dateType == "3"'>
+            select concat(vv.year, '年第', vv.quarter, '季度' ) as time, vv.type, count(tt.id) as cnt
+        </if>
+        from
+        (select v.* from v_date_illegal v where v.ms between #{startTime} and  #{endTime}  ) vv
+        left join
+        (select t.id,left(FROM_UNIXTIME(create_time / 1000),10) as date, t.type from illegal_report t
+        where t.create_time between #{startTime} and  #{endTime}
+        <if test="depts != null and depts.size() > 0">
+            and t.jurisdiction in
+            <foreach collection="depts" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ) tt
+        on (CONCAT(vv.year,'-', vv.month, '-', vv.day) = tt.date and vv.type = tt.type)
+        <if test='dateType == "0"'>
+            group by CONCAT(vv.year,'-', vv.month, '-', vv.day), vv.type
+        </if>
+        <if test='dateType == "1"'>
+            group by vv.week, vv.type
+        </if>
+        <if test='dateType == "2"'>
+            group by vv.month, vv.type
+        </if>
+        <if test='dateType == "3"'>
+            group by vv.quarter, vv.type
+        </if>
+        order by CONCAT(vv.year,'-', vv.month, '-', vv.day)
+    </select>
+
+    <select id="getDealStatisticsByType" resultType="com.nts.iot.modules.miniApp.dto.IllegalStatisticsDTO" >
+        select dd. time, sum(dd.diffTime)/count(dd.id) as avgTime, max(dd.diffTime) as maxDealTime, min(dd.diffTime) as minDealTime
+        from
+        (
+            <!--  按天统计 -->
+            <if test='dateType == "0"'>
+                select CONCAT(vv.year,'-', vv.month, '-', vv.day) as time, tt.id, tt.create_time, tt.deal_time, tt.diffTime
+            </if>
+            <!-- 按周统计 -->
+            <if test='dateType == "1"'>
+                select concat(vv.year, '年第', vv.week, '周' ) as time, tt.id, tt.create_time, tt.deal_time, tt.diffTime
+            </if>
+            <!--  按月统计 -->
+            <if test='dateType == "2"'>
+                select concat(vv.year, '年第', vv.month, '月' ) as time, tt.id, tt.create_time, tt.deal_time, tt.diffTime
+            </if>
+            <!--  按季度统计 -->
+            <if test='dateType == "3"'>
+                select concat(vv.year, '年第', vv.quarter, '季度' ) as time, tt.id, tt.create_time, tt.deal_time, tt.diffTime
+            </if>
+            from
+                (select v.* from v_date_illegal v where v.ms between #{startTime} and  #{endTime}  ) vv
+                left join
+                (select t.id,left(FROM_UNIXTIME(create_time / 1000),10) as date, t.create_time, t.deal_time, t.type, t.diffTime
+                    from v_illegal t
+                    where t.create_time between #{startTime} and  #{endTime}
+                    <if test="depts != null and depts.size() > 0">
+                        and t.jurisdiction in
+                        <foreach collection="depts" index="index" item="item" open="(" separator="," close=")">
+                            #{item}
+                        </foreach>
+                    </if>
+                ) tt
+                on (CONCAT(vv.year,'-', vv.month, '-', vv.day) = tt.date and vv.type = tt.type)
+            order by CONCAT(vv.year,'-', vv.month, '-', vv.day)
+        ) dd
+        group by dd.time
+        order by dd.time
+    </select>
+</mapper>

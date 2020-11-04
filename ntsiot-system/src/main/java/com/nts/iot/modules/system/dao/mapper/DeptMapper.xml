@@ -1,0 +1,117 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.DeptMapper">
+    <sql id="Base_Column_List">
+        id as "id",
+        name as "name",
+        create_time as "createTime",
+        enabled as "enabled",
+        pid as "pid",
+        number as "number",
+        code as "code" ,
+        logo as "logo" ,
+        bike_icon as "bikeIcon",
+        app_id as "appId",
+        secret as "secret",
+        token as "token",
+        aes_key as "aesKey",
+        city_phone as "cityPhone",
+        dept_phone as "deptPhone",
+        longitude as "longitude",
+        latitude as "latitude",
+        check_license as "checkLicense"
+	</sql>
+
+    <select id="queryAll" resultType="com.nts.iot.modules.system.dto.DeptDTO">
+        select
+        <include refid="Base_Column_List"/>, concat(name, ' (ID:', id, ')') as aliasName
+        from dept where 1=1
+        <if test="dept.name != null and dept.name != ''">
+            and name like concat(concat("%",#{dept.name}),"%")
+        </if>
+        <if test="dept.enabled != null">
+            and enabled = #{dept.enabled}
+        </if>
+        <if test="deptIds != null and deptIds.size() > 0">
+            and id in
+            <foreach collection="deptIds" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+
+
+    <select id="findByRoles" resultType="com.nts.iot.modules.system.model.Dept">
+        select
+        d.id, d.pid, d.name, d.create_time as createTime, d.enabled
+        from dept d, roles_depts rd
+        where d.id = rd.dept_id
+        <if test="roles.size()!=0">
+            and rd.role_id in
+            <foreach collection="roles" index="index" item="item" open="(" separator="," close=")">
+                #{item.id}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findByCode" resultType="com.nts.iot.modules.system.model.Dept">
+        select
+        <include refid="Base_Column_List"/>
+        from dept where number like concat(concat("%",#{code}),"%") or code = #{code}
+    </select>
+
+    <select id="getDeptAll" resultType="com.nts.iot.modules.system.model.Dept">
+        select
+        <include refid="Base_Column_List"/>
+        from dept
+    </select>
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.Dept">
+        select
+        <include refid="Base_Column_List"/>
+        from dept
+        where 1=1
+        <if test="name != null and name != ''">
+            and name like concat(concat("%",#{name}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by create_time asc
+    </select>
+
+    <!--需求变更后，辖区的phone不存储在dept表中，而是存在辖区配置-jurisdiction_config表中。所以要关联查询phone -->
+    <select id="getDeptAllAndJurisdictionConfig" resultType="com.nts.iot.modules.system.model.Dept">
+        select
+        d.id as "id",
+        d.name as "name",
+        d.create_time as "createTime",
+        d.enabled as "enabled",
+        d.pid as "pid",
+        d.number as "number",
+        d.code as "code" ,
+        d.logo as "logo" ,
+        d.bike_icon as "bikeIcon",
+        d.app_id as "appId",
+        d.secret as "secret",
+        d.token as "token",
+        d.aes_key as "aesKey",
+        d.city_phone as "cityPhone",
+        j.phone as "deptPhone",
+        j.longitude as "longitude",
+        j.latitude as "latitude",
+        d.check_license as "checkLicense"
+        from
+        dept d left join jurisdiction_configuration j on d.id=j.jurisdiction
+        where d.id in
+        <foreach collection="deptIds" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+
+    </select>
+
+</mapper>

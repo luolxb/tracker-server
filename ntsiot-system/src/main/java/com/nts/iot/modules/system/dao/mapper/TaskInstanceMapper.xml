@@ -1,0 +1,56 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.TaskInstanceMapper">
+
+
+    <sql id="Base_Column_List">
+        id as "id",
+        template_name as "templateName",
+        task_name as "taskName",
+        path as "path",
+        start_up as "startUp",
+        dept_id as "deptId",
+        remark as "remark",
+        create_time as "createTime",
+        update_time as "updateTime",
+        template_id as "templateId",
+        repeat_time as "repeatTime",
+        sys_patrol_start_time as "sysPatrolStartTime",
+        sys_patrol_end_time as "sysPatrolEndTime",
+        exec_time as "execTime",
+        active_date_start as "activeDateStart",
+        active_date_end as "activeDateEnd"
+	</sql>
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.TaskInstance">
+        select
+        <include refid="Base_Column_List"/>
+        from t_task_instance
+        where 1=1
+        <if test="title != null and title != ''">
+            and task_name like concat(concat("%",#{title}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and dept_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by create_time desc
+    </select>
+
+    <update id="updateTaskStatus">
+        update t_task_instance set start_up = #{status} where id = #{taskId}
+    </update>
+
+    <select id="getTimeInList" resultType="com.nts.iot.modules.system.model.TaskInstance">
+        select
+        <include refid="Base_Column_List"/>
+        from t_task_instance task
+        WHERE
+        STR_TO_DATE(task.sys_patrol_start_time,'%T')  <![CDATA[ < ADDDATE(curtime(),interval task.exec_time MINUTE) ]]>
+        and start_up = '0'
+        order by create_time desc
+    </select>
+
+
+</mapper>

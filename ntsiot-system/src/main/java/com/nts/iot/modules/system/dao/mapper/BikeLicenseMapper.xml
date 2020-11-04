@@ -1,0 +1,57 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.BikeLicenseMapper">
+
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.BikeLicense">
+        select
+        b.id,
+        b.telephone,
+        b.jurisdiction,
+        b.type,
+        b.start_time as startTime,
+        b.end_time as endTime,
+        d.name as deptName,
+        u.name as "username"
+        from bike_license b
+        left join dept d on b.jurisdiction = d.id
+        left join t_ma_user u on b.telephone = u.phone
+        where 1 = 1
+        <if test="name != null and name != ''">
+            and u.name like concat(concat("%",#{name}),"%")
+        </if>
+        <if test="telephone != null and telephone != ''">
+            and b.telephone like concat(concat("%",#{telephone}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and b.jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by b.create_time desc
+    </select>
+
+    <select id="selectAll" resultType="com.nts.iot.modules.system.model.BikeLicense">
+        select
+        b.id,
+        b.telephone,
+        b.jurisdiction,
+        b.type,
+        b.start_time as startTime,
+        b.end_time as endTime,
+        d.name as deptName,
+        u.name as "username"
+        from bike_license b
+        left join dept d on b.jurisdiction = d.id
+        left join t_ma_user u on b.telephone = u.phone
+        where 1 = 1
+        <if test="telephone != null and telephone != ''">
+            and b.telephone = #{telephone}
+        </if>
+        <if test="jurisdiction != null and jurisdiction != ''">
+            and b.jurisdiction = #{jurisdiction}
+        </if>
+        order by b.create_time desc
+    </select>
+
+</mapper>

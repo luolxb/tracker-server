@@ -1,0 +1,51 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.BikeMapper">
+
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.Bike">
+        select
+        b.id, b.lock_barcode as lockBarcode, bt.bike_barcode as bikeBarcode, b.jurisdiction_id as jurisdiction,
+        b.create_time as createTime, b.creator, b.update_time as updateTime, b.updater, d.name as deptName, b.user,
+        b.type, b.phone,b.unlock_mode, bi.bike_type as bikeType, b.bike_seq as bikeSeq,b.show_real_line as showRealLine,
+        b.color as color
+        from bike b
+        inner join dept d on b.jurisdiction_id = d.id
+        inner join t_bike_lock bt on b.bike_barcode = bt.bike_barcode
+        left join bike_icon bi on b.type = bi.id
+        where 1 = 1
+        <if test="bike.bikeBarcode != null and bike.bikeBarcode != ''">
+            and b.bike_barcode like concat(concat("%",#{bike.bikeBarcode}),"%")
+        </if>
+        <if test="bike.lockBarcode != null and bike.lockBarcode != ''">
+            and b.lock_barcode like concat(concat("%",#{bike.lockBarcode}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and b.jurisdiction_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by b.bike_seq desc, b.create_time desc
+    </select>
+
+    <select id="selectByPageApp" resultType="com.nts.iot.modules.system.model.Bike">
+        select
+        b.id, b.lock_barcode as lockBarcode, bt.bike_barcode as bikeBarcode, b.jurisdiction_id as jurisdiction,
+        b.create_time as createTime, b.creator, b.update_time as updateTime, b.updater, d.name as deptName, b.user,
+        b.type, b.phone,b.unlock_mode, bi.bike_type as bikeType, b.bike_seq as bikeSeq,b.show_real_line as showRealLine,
+        b.color as color
+        from bike b
+        inner join dept d on b.jurisdiction_id = d.id
+        inner join t_bike_lock bt on b.bike_barcode = bt.bike_barcode
+        left join bike_icon bi on b.type = bi.id
+        where 1 = 1
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and b.jurisdiction_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by b.bike_seq desc, b.create_time desc
+    </select>
+
+</mapper>

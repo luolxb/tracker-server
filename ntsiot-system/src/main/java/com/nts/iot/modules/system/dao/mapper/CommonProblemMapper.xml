@@ -1,0 +1,21 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.CommonProblemMapper">
+
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.CommonProblem">
+        select id, title, content, jurisdiction, is_visible as isVisible, create_time as createTime
+        from common_problem
+        where 1=1
+        <if test="title != null and title != ''">
+            and title like concat(concat("%",#{title}),"%")
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by create_time desc
+    </select>
+
+</mapper>

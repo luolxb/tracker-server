@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.miniApp.dao.AccountHistoryMapper">
+    <!-- 查询流水表 -->
+    <select id="queryAll" resultType="com.nts.iot.modules.miniApp.model.AccountHistory">
+        SELECT
+        history.id as "id",
+        history.account_id as "accountId",
+        history.balance as "balance",
+        history.balance_amount as "balanceAmount",
+        history.wexin_amount as "wexinAmount",
+        history.weixin_no as "weixinNo",
+        history.create_time as "createTime",
+        history.type as "type",
+        account.user_id as "userId",
+        account.balance as "balance",
+        account.total_expend as "totalExpend",
+        u.name as "userName",
+        d.name as "deptName",
+        d.id as "deptId"
+        FROM
+        t_account_history history
+        left join t_account account on account.id = history.account_id
+        left join t_ma_user u on u.id = account.user_id
+        left join dept d on d.id = u.dept_id
+        where 1=1
+        <if test="jurisdiction != null and jurisdiction != ''">
+            and u.dept_id = #{jurisdiction}
+        </if>
+        <if test="userName != null and userName != ''">
+            and u.userName like concat(concat("%",#{userName}),"%")
+        </if>
+        order by history.create_time desc
+    </select>
+
+</mapper>

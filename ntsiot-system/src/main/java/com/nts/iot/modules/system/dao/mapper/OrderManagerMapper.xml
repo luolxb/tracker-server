@@ -1,0 +1,153 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nts.iot.modules.system.dao.OrderManagerMapper">
+
+
+    <select id="selectByPage" resultType="com.nts.iot.modules.system.model.Order">
+        select
+        o.id,
+        o.order_id as orderId,
+        o.status,
+        o.bike_barcode as bikeBarcode,
+        o.start_time as startTime,
+        o.start_lat as startLat,
+        o.start_lng as startLng,
+        o.end_time as endTime,
+        o.end_lat as endLat,
+        o.end_lng as endLng,
+        o.mile,
+        o.jurisdiction,
+        o.close_source as closeSource,
+        o.unlock_mode,
+        (case when o.order_amount is null then 0.00 else o.order_amount end) as orderAmount,
+        (case when o.compensation_amount is null then 0.00 else o.compensation_amount end) as compensationAmount,
+        d.name as deptName,
+        u.name as "username",
+        u.phone,
+        o.end_time - o.start_time as timeLength,
+        bl.lock_barcode as lockBarcode
+        from orders o inner join dept d on o.jurisdiction = d.id
+        left join t_ma_user u on o.user_id = u.id
+        left join t_bike_lock bl on o.bike_barcode = bl.bike_barcode
+        where 1 = 1
+        <if test="order.orderId != null and order.orderId != ''">
+            and o.order_id like concat(concat("%",#{order.orderId}),"%")
+        </if>
+        <if test="order.username != null and order.username != ''">
+            and (u.name like concat(concat("%",#{order.username}),"%") or u.phone like concat(concat("%",#{order.username}),"%"))
+        </if>
+        <if test="order.bikeBarcode != null and order.bikeBarcode != ''">
+            and o.bike_barcode like concat(concat("%",#{order.bikeBarcode}),"%")
+        </if>
+        <if test="order.status != null and order.status != ''">
+            and o.status = #{order.status}
+        </if>
+        <if test="order.closeSource != null and order.closeSource != ''">
+            and o.close_source = #{order.closeSource}
+        </if>
+        <if test="order.startTime != null and order.startTime != ''">
+            and o.start_time <![CDATA[ >= ]]> #{order.startTime}
+        </if>
+        <if test="order.endTime != null and order.endTime != ''">
+            and o.end_time <![CDATA[ <= ]]> #{order.endTime}
+        </if>
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and o.jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        order by o.order_id desc
+    </select>
+
+    <select id="rankByAllUser" resultType="com.nts.iot.modules.miniApp.model.RankByUser">
+        select ma.id,ma.name,ma.avatar
+        from t_ma_user ma
+        where 1=1
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and ma.dept_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="rankByAllUserPc" resultType="com.nts.iot.modules.miniApp.model.RankByUser">
+        SELECT
+        ma.id,
+        ma.NAME,
+        ma.avatar
+        FROM
+        t_ma_user ma
+        WHERE
+        ma.id NOT IN ( SELECT user_id FROM orders o WHERE o.end_time &gt;= #{startTime} and o.end_time &lt;= #{endTime} )
+        AND ma.user_type = 0
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and ma.dept_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        ORDER BY
+        ma.id ASC
+    </select>
+
+    <select id="rankByJurisdiction" resultType="com.nts.iot.modules.miniApp.model.RankByUser">
+        select ma.id,ma.name,ma.avatar,IFNULL(sum(o.mile),0) as mile
+        from orders o
+        left join t_ma_user ma on o.user_id=ma.id
+        where 1=1 and o.end_time &gt;= #{startTime} and o.end_time &lt;= #{endTime}
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and o.jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY o.user_id
+        HAVING ma.name is not NULL
+        ORDER BY mile desc
+    </select>
+
+
+    <select id="rankByJurisdictionPc" resultType="com.nts.iot.modules.miniApp.model.RankByUser">
+        select ma.id,ma.name,ma.avatar,IFNULL(sum(o.mile),0) as mile
+        from orders o
+        left join t_ma_user ma on o.user_id=ma.id
+        where 1=1 and o.end_time &gt;= #{startTime} and o.end_time &lt;= #{endTime}
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and o.jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY o.user_id
+        HAVING ma.name is not NULL
+        ORDER BY mile desc
+    </select>
+
+
+    <select id="rankByBikeJurisdictionPc" resultType="com.nts.iot.modules.miniApp.model.RankByBike">
+        select b.id,b.bike_barcode,b.lock_barcode,b.jurisdiction_id,j.logo_url as logoUrl,IFNULL(sum(o.mile),0) as mile
+        from orders o
+        left JOIN bike b on o.bike_barcode=b.bike_barcode
+        left JOIN jurisdiction_configuration j on b.jurisdiction_id=j.jurisdiction
+        where 1=1 and o.end_time &gt;= #{startTime} and o.end_time &lt;= #{endTime}
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and o.jurisdiction in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY o.bike_barcode
+        HAVING b.id is not NULL
+        <if test="jurisdictions != null and jurisdictions.size() > 0">
+            and b.jurisdiction_id in
+            <foreach collection="jurisdictions" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY mile desc
+    </select>
+
+
+</mapper>

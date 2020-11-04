@@ -1,0 +1,41 @@
+spring:
+  kafka:
+    bootstrap-servers: 118.89.109.254:9092
+    producer:
+      retries: 0
+      batch-size: 16384
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: consumer-group
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      auto-commit-interval: 100s
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  redis:
+    #数据库索引
+    database: 8
+    host: 10.105.9.161
+    port: 6379
+    password: CyoU!#rD@170
+    jedis:
+      pool:
+        #最大连接数
+        max-active: 100
+        #最大阻塞等待时间(负数表示没限制)
+        max-wait: 2000
+        #最大空闲
+        max-idle: 500
+        #最小空闲
+        min-idle: 8
+    #连接超时时间
+    timeout: 5000
+
+systemServerUrl: 115.159.188.112:8000 #"http://rnstec.natappvip.cc" #115.159.188.112:8000
+influx:
+  host: http://47.98.232.46:8086
+  user: admin
+  password: admin
+  database: ntsiot_prod
